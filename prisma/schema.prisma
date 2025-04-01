@@ -31,12 +31,14 @@ model Skill {
 }
 
 model User {
-  id    String @id
-  email String
-  name  String
-  Resume Resume?
-  Education UserEducation[]
-  Career UserCareer[]
+  id           String             @id @default(uuid())
+  email        String             @unique
+  name         String
+  refreshToken String[]
+  profileImage String?
+  Resume       Resume?            
+  Education    UserEducation[]   
+  Career       UserCareer[]       
 }
 
 model Resume {

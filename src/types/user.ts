@@ -6,7 +6,9 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  profileImage?: string;
   Resume?: Resume;
-  Education: UserEducation[];
-  Career: UserCareer[];
+  Education?: UserEducation[];
+  Career?: UserCareer[];
+  refreshToken?: string[];
 }
