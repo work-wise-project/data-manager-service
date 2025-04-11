@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,54 +7,94 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum FileType {
-  audio
-  text
+model company {
+  id                    Int                     @id @default(autoincrement())
+  name                  String
+  info                  String
+  interview_preparation interview_preparation[]
 }
 
-model Company {
-  id   Int    @id @default(autoincrement())
-  name String
-  info String
+model interview {
+  id                    String                 @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  user_id               String                 @map("user") @db.Uuid
+  date                  DateTime               @db.Timestamptz(6)
+  job_link              String
+  user                  user                   @relation("interview_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  interview_analysis    interview_analysis?    @relation("interview_analysis_interviewTointerview")
+  interview_preparation interview_preparation? @relation("interview_preparation_interviewTointerview")
 }
 
-model Skill {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  isDeleted Boolean @default(false)
+model interview_analysis {
+  interview_id String    @id @map("interview") @db.Uuid
+  file_name    String
+  file_type    file_type
+  analysis     String
+  interview    interview @relation("interview_analysis_interviewTointerview", fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model User {
-  id           String             @id @default(uuid())
-  email        String             @unique
-  name         String
-  refreshToken String[]
-  profileImage String?
-  Resume       Resume?            
-  Education    UserEducation[]   
-  Career       UserCareer[]       
+model interview_preparation {
+  interview_id   String    @id @map("interview") @db.Uuid
+  company_id     Int
+  job_info       String
+  material_links String[]
+  company        company   @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  interview      interview @relation("interview_preparation_interviewTointerview", fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model Resume {
-  user        User   @relation(fields: [userId], references: [id])
-  userId      String @id
+model resume {
+  user_id     String  @id @map("user") @db.Uuid
   file        String
   analysis    String?
-  spellCheck  String?
+  spell_check String?
+  user        user    @relation("resume_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model UserEducation {
+model skill {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  is_deleted  Boolean      @default(false)
+  user_skills user_skill[] @relation("user_skill_skillToskill")
+}
+
+model user {
+  id             String           @id @default(dbgenerated("public.uuid_generate_v4()")) @db.Uuid
+  email          String           @unique
+  name           String
+  refresh_tokens String[]
+  interviews     interview[]      @relation("interview_userTouser")
+  resume         resume?          @relation("resume_userTouser")
+  user_career    user_career[]    @relation("user_career_userTouser")
+  user_education user_education[] @relation("user_education_userTouser")
+  user_skills    user_skill[]     @relation("user_skill_userTouser")
+}
+
+model user_career {
   id        Int    @id @default(autoincrement())
-  user      User   @relation(fields: [userId], references: [id])
-  userId    String
+  user_id   String @map("user") @db.Uuid
+  company   String
+  job_title String
+  years     Int
+  user      user   @relation("user_career_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_education {
+  id        Int    @id @default(autoincrement())
+  user_id   String @map("user") @db.Uuid
   institute String
   years     Int
+  user      user   @relation("user_education_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model UserCareer {
-  id       Int    @id @default(autoincrement())
-  user     User   @relation(fields: [userId], references: [id])
-  userId   String
-  company  String
-  years    Int
+model user_skill {
+  user_id  String @map("user") @db.Uuid
+  skill_id Int    @map("skill")
+  skill    skill  @relation("user_skill_skillToskill", fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user     user   @relation("user_skill_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, skill_id])
+}
+
+enum file_type {
+  audio
+  text
 }

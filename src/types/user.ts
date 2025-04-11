@@ -1,14 +1,7 @@
-import { Resume } from './resume';
-import { UserEducation } from './userEducation';
-import { UserCareer } from './userCareer';
+import { resume, user, user_career, user_education } from '@prisma/client';
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  profileImage?: string;
-  Resume?: Resume;
-  Education?: UserEducation[];
-  Career?: UserCareer[];
-  refreshToken?: string[];
-}
+export type UserBody = user & {
+    resume?: resume;
+    education?: user_education[];
+    career?: user_career[];
+};
