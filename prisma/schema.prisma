@@ -71,8 +71,8 @@ model user {
 model user_career {
   id        Int    @id @default(autoincrement())
   user_id   String @map("user") @db.Uuid
-  company   String
-  job_title String
+  company   String?
+  job_title String?
   years     Int
   user      user   @relation("user_career_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

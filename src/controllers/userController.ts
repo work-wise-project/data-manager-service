@@ -13,46 +13,45 @@ import status from 'http-status';
 //   }
 // };
 
-export const getUserByIdOrEmailController = async (
-  req: Request,
-  res: Response,
-) => {
-  const { id, email } = req.query;
-  try {
-    if (id) {
-      const user = await userService.getUserById(id.toString());
-      res.status(status.OK).json(user);
-    } else if (email) {
-      const user = await userService.getUserByEmail(email.toString());
-      res.status(status.OK).json(user);
-    } else {
-      throw new Error('Not supplied email or id');
+export const getUserByIdOrEmailController = async (req: Request, res: Response) => {
+    const { id, email } = req.query;
+    try {
+        if (id) {
+            const user = await userService.getUserById(id.toString());
+            res.status(status.OK).json(user);
+        } else if (email) {
+            const user = await userService.getUserByEmail(email.toString());
+            res.status(status.OK).json(user);
+        } else {
+            throw new Error('Not supplied email or id');
+        }
+    } catch (error) {
+        res.status(status.BAD_REQUEST).send(error);
     }
-  } catch (error) {
-    res.status(status.BAD_REQUEST).send(error);
-  }
 };
 
 export const createUser = async (req: Request, res: Response) => {
-  try {
-    const user = await userService.createUser(req.body);
-    res.status(status.OK).json(user);
-  } catch (error) {
-    res.status(status.BAD_REQUEST).send(error);
-  }
+    try {
+        const user = await userService.createUser(req.body);
+        res.status(status.OK).json(user);
+    } catch (error) {
+        res.status(status.BAD_REQUEST).send(error);
+    }
 };
 
 export const updateUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    if (id) {
-      const user = await userService.updateUser(id, req.body);
-      res.status(status.OK).json(user);
-    } else {
-      throw new Error('Not supplied id');
+    try {
+        if (id) {
+            const user = await userService.updateUser(id, req.body);
+            res.status(status.OK).json(user);
+        } else {
+            throw new Error('Not supplied id');
+        }
+    } catch (error) {
+        console.log('error', error);
+
+        res.status(status.BAD_REQUEST).send(error);
     }
-  } catch (error) {
-    res.status(status.BAD_REQUEST).send(error);
-  }
 };
