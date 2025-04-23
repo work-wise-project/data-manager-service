@@ -1,6 +1,6 @@
-import { userService } from '../services/userService';
 import { Request, Response } from 'express';
 import status from 'http-status';
+import { userService } from '../services';
 
 // export const addSkillToUserController = async (req: Request, res: Response) => {
 //   const { userId, skillName } = req.body;

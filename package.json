@@ -25,7 +25,8 @@
   "dependencies": {
     "@prisma/client": "^6.6.0",
     "express": "^4.21.2",
-    "http-status": "^2.1.0"
+    "http-status": "^2.1.0",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
