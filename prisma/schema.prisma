@@ -19,6 +19,7 @@ model interview {
   user_id               String                 @map("user") @db.Uuid
   date                  DateTime               @db.Timestamptz(6)
   job_link              String
+  title              String
   user                  user                   @relation("interview_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   interview_analysis    interview_analysis?    @relation("interview_analysis_interviewTointerview")
   interview_preparation interview_preparation? @relation("interview_preparation_interviewTointerview")
