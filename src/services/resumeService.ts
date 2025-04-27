@@ -14,9 +14,25 @@ class ResumeService {
 
     uploadResume = async (file: Express.Multer.File) => {
         try {
-            await getStorageClient().uploadFile(file.originalname, file.buffer);
+            return await getStorageClient().uploadFile(file.originalname, file.buffer, file.mimetype);
         } catch (error) {
             console.error('Error uploading resume:', error);
+            throw error;
+        } finally {
+            await prisma.$disconnect();
+        }
+    };
+
+    getResume = async (
+        userId: string
+    ): Promise<{
+        fileBuffer: Buffer;
+        mimeType: string | undefined;
+    }> => {
+        try {
+            return await getStorageClient().downloadFile(userId);
+        } catch (error) {
+            console.error('Error downloading resume:', error);
             throw error;
         } finally {
             await prisma.$disconnect();
