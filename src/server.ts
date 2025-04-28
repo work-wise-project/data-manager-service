@@ -1,5 +1,6 @@
 import express from 'express';
 import userRoute from './router/userRoute';
+import skillRoute from './router/skillRoute';
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', userRoute);
+app.use('/skills', skillRoute);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
