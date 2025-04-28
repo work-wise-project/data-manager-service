@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import HttpStatus from 'http-status';
 import { ZodError } from 'zod';
-import { createInterviewRouter, userRoute } from './router';
+import { interviewRouter, userRouter } from './router';
 import resumeRoute from './router/resumeRoute';
 import skillRoute from './router/skillRoute';
 
@@ -13,8 +13,8 @@ app.get('/', (req, res) => {
     res.send('Data Manager Server is running!');
 });
 
-app.use('/users', userRoute);
-app.use('/interviews', createInterviewRouter());
+app.use('/users', userRouter);
+app.use('/interviews', interviewRouter);
 app.use('/skills', skillRoute);
 app.use('/resume', resumeRoute);
 

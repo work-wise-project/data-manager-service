@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { createUser, getUserByIdOrEmailController, updateUser } from '../controllers/userController';
 
-export const router = Router();
+export const userRouter = Router();
 
-router.get('/', getUserByIdOrEmailController);
+userRouter.get('/', getUserByIdOrEmailController);
 
-router.post('/', createUser);
+userRouter.post('/', createUser);
 
-router.put('/:id', updateUser);
+userRouter.put('/:id', updateUser);
