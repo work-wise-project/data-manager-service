@@ -11,14 +11,6 @@ import { createInterviewAnalysis, getInterviewAnalysis } from '../services';
 
 export const interviewRouter = Router();
 
-interviewRouter.post('/', createInterview);
-
-interviewRouter.delete('/:id', deleteInterview);
-
-interviewRouter.get('/:userId', getInterviewsByUserId);
-
-interviewRouter.get('/:userId/schedule', getInterviewsGrouypedByDate);
-
 interviewRouter.get('/analysis/:interviewId', async (req, res) => {
     const { interviewId } = getInterviewAnalysisSchema.parse(req.params);
 
@@ -34,3 +26,11 @@ interviewRouter.post('/analysis', async (req, res) => {
 
     res.status(HttpStatus.CREATED).send({ message: 'Interview analysis created successfully' });
 });
+
+interviewRouter.post('/', createInterview);
+
+interviewRouter.delete('/:id', deleteInterview);
+
+interviewRouter.get('/:userId', getInterviewsByUserId);
+
+interviewRouter.get('/:userId/schedule', getInterviewsGrouypedByDate);
