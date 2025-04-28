@@ -1,5 +1,7 @@
 import express from 'express';
-import { userRouter, interviewRouter } from './router/';
+import { interviewRouter, userRouter } from './router/';
+import resumeRoute from './router/resumeRoute';
+import skillRoute from './router/skillRoute';
 
 const app = express();
 
@@ -11,6 +13,8 @@ app.get('/', (req, res) => {
 
 app.use('/users', userRouter);
 app.use('/interviews', interviewRouter);
+app.use('/skills', skillRoute);
+app.use('/resume', resumeRoute);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

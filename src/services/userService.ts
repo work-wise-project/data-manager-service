@@ -113,17 +113,40 @@ class UserService {
         return createdUser;
     }
 
-    async updateUser(id: string, { career, education, resume, ...userUpdates }: UserBody) {
+    async updateUser(id: string, { career, education, resume, skills, ...userUpdates }: UserBody) {
         const updatedUser = await prisma.user.update({
             where: { id },
             data: {
-                ...userUpdates,
+                name: userUpdates.name,
+                email: userUpdates.email,
+                refresh_tokens: userUpdates.refresh_tokens,
                 resume: resume ? { update: resume } : undefined,
                 user_education: education?.length
-                    ? { update: education.map(({ id, ...education }) => ({ where: { id }, data: { ...education } })) }
+                    ? {
+                          create: education.map((educationData) => ({
+                              user_id: educationData.user_id,
+                              institute: educationData.institute,
+                              years: educationData.years,
+                          })),
+                      }
                     : undefined,
                 user_career: career?.length
-                    ? { update: career.map(({ id, ...career }) => ({ where: { id }, data: { ...career } })) }
+                    ? {
+                          create: career.map((careerData) => ({
+                              company: careerData.company,
+                              years: careerData.years,
+                          })),
+                      }
+                    : undefined,
+                user_skills: skills?.length
+                    ? {
+                          deleteMany: {},
+                          create: skills.map((skill) => ({
+                              skill: {
+                                  connect: { id: skill.skill_id },
+                              },
+                          })),
+                      }
                     : undefined,
             },
         });
