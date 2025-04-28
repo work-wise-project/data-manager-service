@@ -1,7 +1,7 @@
 import express from 'express';
-import userRoute from './router/userRoute';
-import skillRoute from './router/skillRoute';
+import { interviewRouter, userRouter } from './router/';
 import resumeRoute from './router/resumeRoute';
+import skillRoute from './router/skillRoute';
 
 const app = express();
 
@@ -11,7 +11,8 @@ app.get('/', (req, res) => {
     res.send('Data Manager Server is running!');
 });
 
-app.use('/users', userRoute);
+app.use('/users', userRouter);
+app.use('/interviews', interviewRouter);
 app.use('/skills', skillRoute);
 app.use('/resume', resumeRoute);
 
