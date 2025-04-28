@@ -29,7 +29,7 @@ model interview_analysis {
   interview_id String    @id @map("interview") @db.Uuid
   file_name    String
   file_type    file_type
-  analysis     String
+  analysis     Json
   interview    interview @relation("interview_analysis_interviewTointerview", fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
