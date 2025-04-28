@@ -2,6 +2,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import HttpStatus from 'http-status';
 import { ZodError } from 'zod';
 import { createInterviewRouter, userRoute } from './router';
+import resumeRoute from './router/resumeRoute';
+import skillRoute from './router/skillRoute';
 
 const app = express();
 
@@ -13,6 +15,8 @@ app.get('/', (req, res) => {
 
 app.use('/users', userRoute);
 app.use('/interviews', createInterviewRouter());
+app.use('/skills', skillRoute);
+app.use('/resume', resumeRoute);
 
 app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
     if (error instanceof ZodError) {
