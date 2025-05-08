@@ -3,5 +3,6 @@ export type Config = {
     port: number;
     googleProjectId: string;
     googleCloudKey: string;
-    googleStorageBucket: string;
+    googleStorageResumeBucket: string;
+    googleStorageAudioBucket: string;
 };

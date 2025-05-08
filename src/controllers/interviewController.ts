@@ -56,14 +56,14 @@ export const getInterviewsByUserId = async (req: Request, res: Response) => {
     }
 };
 
-export const getInterviewsGrouypedByDate = async (req: Request, res: Response) => {
+export const getInterviewsGroupedByDate = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
         if (!userId) {
             res.status(status.BAD_REQUEST).send({ message: 'Missing user ID' });
             return;
         }
-        const interviews = await interviewService.getInterviewsGrouypedByDate(userId);
+        const interviews = await interviewService.getInterviewsGroupedByDate(userId);
         res.status(status.OK).json(interviews);
     } catch (error) {
         console.log('Error fetching grouped interviews:', error);
