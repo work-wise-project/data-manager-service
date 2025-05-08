@@ -15,9 +15,12 @@ interviewRouter.get('/analysis/:interviewId', async (req, res) => {
     const { interviewId } = getInterviewAnalysisSchema.parse(req.params);
 
     const interviewAnalysis = await getInterviewAnalysis(interviewId);
-    const file = await getInterviewAudioFile(interviewId);
+    const { fileBuffer, mimeType } = await getInterviewAudioFile(interviewId);
 
-    res.status(HttpStatus.OK).send({ analysis: interviewAnalysis, file });
+    res.status(HttpStatus.OK).send({
+        analysis: interviewAnalysis,
+        file: { mimeType, fileBuffer: fileBuffer.toString('base64') },
+    });
 });
 
 interviewRouter.post('/analysis', async (req, res) => {
