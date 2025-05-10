@@ -15,5 +15,13 @@ export const createInterviewAnalysis = async (analysis: CreateInterviewAnalysisS
         where: { interview_id: analysis.interview_id },
     });
 
-export const getInterviewAudioFile = async (interviewId: string) =>
-    await getStorageClient().downloadFile(bucket, `${interviewId}.wav`);
+export const getInterviewAudioFile = async (interviewId: string) => {
+    try {
+        return await getStorageClient().downloadFile(bucket, `${interviewId}.wav`);
+    } catch (error) {
+        console.error('Error downloading audio:', error);
+        throw error;
+    } finally {
+        await prisma.$disconnect();
+    }
+};

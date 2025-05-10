@@ -12,23 +12,33 @@ import { createInterviewAnalysis, getInterviewAnalysis, getInterviewAudioFile } 
 export const interviewRouter = Router();
 
 interviewRouter.get('/analysis/:interviewId', async (req, res) => {
-    const { interviewId } = getInterviewAnalysisSchema.parse(req.params);
+    try {
+        const { interviewId } = getInterviewAnalysisSchema.parse(req.params);
 
-    const interviewAnalysis = await getInterviewAnalysis(interviewId);
-    const { fileBuffer, mimeType } = await getInterviewAudioFile(interviewId);
+        const interviewAnalysis = await getInterviewAnalysis(interviewId);
+        const { fileBuffer, mimeType } = await getInterviewAudioFile(interviewId);
 
-    res.status(HttpStatus.OK).send({
-        analysis: interviewAnalysis,
-        file: { mimeType, fileBuffer: fileBuffer.toString('base64') },
-    });
+        res.status(HttpStatus.OK).send({
+            analysis: interviewAnalysis,
+            file: { mimeType, fileBuffer: fileBuffer.toString('base64') },
+        });
+    } catch (error) {
+        console.error('Error fetching interview analysis');
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Failed to fetch interview analysis' });
+    }
 });
 
 interviewRouter.post('/analysis', async (req, res) => {
-    const body = createInterviewAnalysisSchema.parse(req.body);
+    try {
+        const body = createInterviewAnalysisSchema.parse(req.body);
 
-    await createInterviewAnalysis(body);
+        await createInterviewAnalysis(body);
 
-    res.status(HttpStatus.CREATED).send({ message: 'Interview analysis created successfully' });
+        res.status(HttpStatus.CREATED).send({ message: 'Interview analysis created successfully' });
+    } catch (error) {
+        console.error('Error creating interview analysis');
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Failed to create interview analysis' });
+    }
 });
 
 interviewRouter.post('/', createInterview);
