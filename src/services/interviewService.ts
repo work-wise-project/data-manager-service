@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import { interview } from '@prisma/client';
+import { CreateInterviewPreparationSchema } from '../schemas';
 
 class InterviewService {
     private static instance: InterviewService;
@@ -58,6 +59,28 @@ class InterviewService {
         }, {} as Record<string, any[]>);
 
         return groupedByDay;
+    }
+
+    async getInterviewPreparationByInterviewId(interviewId: string) {
+        try {
+            const interviewPreparation = await prisma.interview_preparation.findFirst({
+                where: { interview_id: interviewId },
+            });
+            return interviewPreparation;
+        } catch (error) {
+            console.error('Error fetching interview preparation:', error);
+            throw error;
+        }
+    }
+
+    async createInterviewPreparation(preparation: CreateInterviewPreparationSchema) {
+        const interviewPreparation = await prisma.interview_preparation.upsert({
+            create: preparation,
+            update: preparation,
+            where: { interview_id: preparation.interview_id },
+        });
+
+        return interviewPreparation;
     }
 }
 

@@ -15,3 +15,16 @@ export const createInterviewAnalysisSchema = z.object({
     }),
 });
 export type CreateInterviewAnalysisSchema = z.infer<typeof createInterviewAnalysisSchema>;
+
+export const getInterviewPreparationSchema = z.object({
+    interviewId: z.string().uuid(),
+});
+export type GetInterviewPreparationSchema = z.infer<typeof getInterviewPreparationSchema>;
+
+export const createInterviewPreparationSchema = z.object({
+    interview_id: z.string().uuid(),
+    company_id: z.number(),
+    job_info: z.string(),
+    material_links: z.array(z.string()),
+});
+export type CreateInterviewPreparationSchema = z.infer<typeof createInterviewPreparationSchema>;

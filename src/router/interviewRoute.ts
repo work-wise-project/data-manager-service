@@ -1,10 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import HttpStatus from 'http-status';
 import {
     createInterview,
     deleteInterview,
     getInterviewsByUserId,
     getInterviewsGroupedByDate,
+    getInterviewPreparation,
 } from '../controllers/interviewController';
 import { createInterviewAnalysisSchema, getInterviewAnalysisSchema } from '../schemas';
 import { createInterviewAnalysis, getInterviewAnalysis, getInterviewAudioFile } from '../services';
@@ -40,6 +41,8 @@ interviewRouter.post('/analysis', async (req, res) => {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Failed to create interview analysis' });
     }
 });
+
+interviewRouter.get('/preparation/:interviewId', getInterviewPreparation);
 
 interviewRouter.post('/', createInterview);
 
