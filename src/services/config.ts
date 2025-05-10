@@ -1,7 +1,12 @@
 import { config as configDotenv } from 'dotenv';
 import { Config } from '../types/config';
 
-const REQUIRED_ENVIRONMENT_VARIABLES = ['GOOGLE_CLOUD_KEY', 'GOOGLE_STORAGE_BUCKET', 'GOOGLE_PROJECT_ID'];
+const REQUIRED_ENVIRONMENT_VARIABLES = [
+    'GOOGLE_CLOUD_KEY',
+    'GOOGLE_STORAGE_RESUME_BUCKET',
+    'GOOGLE_STORAGE_AUDIO_BUCKET',
+    'GOOGLE_PROJECT_ID',
+];
 
 const checkEnvironmentVariables = (requiredEnvironmentVariables: string[]) => {
     if (requiredEnvironmentVariables.some((variable) => !(variable in process.env))) {
@@ -29,7 +34,8 @@ export const getConfig = (): Config => {
         port: Number(env.PORT) || 4000,
         googleProjectId: env.GOOGLE_PROJECT_ID,
         googleCloudKey: env.GOOGLE_CLOUD_KEY,
-        googleStorageBucket: env.GOOGLE_STORAGE_BUCKET,
+        googleStorageResumeBucket: env.GOOGLE_STORAGE_RESUME_BUCKET,
+        googleStorageAudioBucket: env.GOOGLE_STORAGE_AUDIO_BUCKET,
     };
 
     return config;

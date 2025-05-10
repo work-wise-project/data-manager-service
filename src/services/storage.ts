@@ -1,7 +1,7 @@
 import { Storage } from '@google-cloud/storage';
 import { getConfig } from './config';
 
-const { googleCloudKey, googleStorageBucket, googleProjectId } = getConfig();
+const { googleCloudKey, googleProjectId } = getConfig();
 
 let client: Storage;
 
@@ -11,20 +11,20 @@ export const getStorageClient = () => {
     }
 
     return {
-        uploadFile: async (fileName: string, content: Buffer | string, mimeType: string) => {
+        uploadFile: async (bucket: string, fileName: string, content: Buffer | string, mimeType: string) => {
             try {
-                const file = client.bucket(googleStorageBucket).file(fileName);
+                const file = client.bucket(bucket).file(fileName);
 
                 await file.save(content, { contentType: mimeType });
-                return `https://storage.googleapis.com/${googleStorageBucket}/${fileName}`;
+                return `https://storage.googleapis.com/${bucket}/${fileName}`;
             } catch (error) {
                 console.error('Error uploading file:', error);
                 throw error;
             }
         },
-        downloadFile: async (fileName: string) => {
+        downloadFile: async (bucket: string, fileName: string) => {
             try {
-                const file = client.bucket(googleStorageBucket).file(fileName);
+                const file = client.bucket(bucket).file(fileName);
                 const [fileBuffer] = await file.download();
                 const [metadata] = await file.getMetadata();
 

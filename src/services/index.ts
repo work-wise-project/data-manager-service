@@ -1,2 +1,2 @@
-export { createInterviewAnalysis, getInterviewAnalysis } from './interview';
+export { createInterviewAnalysis, getInterviewAnalysis, getInterviewAudioFile } from './interview';
 export { userService } from './userService';

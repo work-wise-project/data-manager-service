@@ -1,5 +1,8 @@
 import prisma from '../prisma';
+import { getConfig } from './config';
 import { getStorageClient } from './storage';
+
+const { googleStorageResumeBucket: bucket } = getConfig();
 
 class ResumeService {
     private static instance: ResumeService;
@@ -14,7 +17,7 @@ class ResumeService {
 
     uploadResume = async (file: Express.Multer.File) => {
         try {
-            return await getStorageClient().uploadFile(file.originalname, file.buffer, file.mimetype);
+            return await getStorageClient().uploadFile(bucket, file.originalname, file.buffer, file.mimetype);
         } catch (error) {
             console.error('Error uploading resume:', error);
             throw error;
@@ -30,7 +33,7 @@ class ResumeService {
         mimeType: string | undefined;
     }> => {
         try {
-            return await getStorageClient().downloadFile(userId);
+            return await getStorageClient().downloadFile(bucket, userId);
         } catch (error) {
             console.error('Error downloading resume:', error);
             throw error;

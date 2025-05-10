@@ -4,10 +4,10 @@ import {
     createInterview,
     deleteInterview,
     getInterviewsByUserId,
-    getInterviewsGrouypedByDate,
+    getInterviewsGroupedByDate,
 } from '../controllers/interviewController';
 import { createInterviewAnalysisSchema, getInterviewAnalysisSchema } from '../schemas';
-import { createInterviewAnalysis, getInterviewAnalysis } from '../services';
+import { createInterviewAnalysis, getInterviewAnalysis, getInterviewAudioFile } from '../services';
 
 export const interviewRouter = Router();
 
@@ -15,8 +15,12 @@ interviewRouter.get('/analysis/:interviewId', async (req, res) => {
     const { interviewId } = getInterviewAnalysisSchema.parse(req.params);
 
     const interviewAnalysis = await getInterviewAnalysis(interviewId);
+    const { fileBuffer, mimeType } = await getInterviewAudioFile(interviewId);
 
-    res.status(HttpStatus.OK).send({ analysis: interviewAnalysis });
+    res.status(HttpStatus.OK).send({
+        analysis: interviewAnalysis,
+        file: { mimeType, fileBuffer: fileBuffer.toString('base64') },
+    });
 });
 
 interviewRouter.post('/analysis', async (req, res) => {
@@ -33,4 +37,4 @@ interviewRouter.delete('/:id', deleteInterview);
 
 interviewRouter.get('/:userId', getInterviewsByUserId);
 
-interviewRouter.get('/:userId/schedule', getInterviewsGrouypedByDate);
+interviewRouter.get('/:userId/schedule', getInterviewsGroupedByDate);

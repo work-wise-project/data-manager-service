@@ -34,7 +34,7 @@ class InterviewService {
         return interviews;
     }
 
-    async getInterviewsGrouypedByDate(userId: string) {
+    async getInterviewsGroupedByDate(userId: string) {
         const result = await prisma.$queryRaw<{ records: any[]; day: string }[]>`
             SELECT 
             json_agg(i) AS records, 
