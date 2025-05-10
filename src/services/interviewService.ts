@@ -19,6 +19,12 @@ class InterviewService {
     }
 
     async deleteInterview(id: string, userId?: string) {
+        await prisma.interview_analysis.deleteMany({
+            where: {
+                interview_id: id,
+            },
+        });
+
         const deletedInterview = await prisma.interview.delete({
             where: { id, user_id: userId },
         });
