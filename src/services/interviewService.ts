@@ -1,6 +1,10 @@
 import prisma from '../prisma';
 import { interview } from '@prisma/client';
-import { CreateInterviewPreparationSchema } from '../schemas';
+import { CreateInterviewPreparationSchema, CreateInterviewAnalysisSchema } from '../schemas';
+import { getStorageClient } from './storage';
+import { getConfig } from './config';
+
+const { googleStorageAudioBucket: bucket } = getConfig();
 
 class InterviewService {
     private static instance: InterviewService;
@@ -41,6 +45,14 @@ class InterviewService {
         return interviews;
     }
 
+    async getInterviewById(id: string) {
+        const interview = await prisma.interview.findUnique({
+            where: { id },
+        });
+
+        return interview;
+    }
+
     async getInterviewsGroupedByDate(userId: string) {
         const result = await prisma.$queryRaw<{ records: any[]; day: string }[]>`
             SELECT 
@@ -59,6 +71,29 @@ class InterviewService {
         }, {} as Record<string, any[]>);
 
         return groupedByDay;
+    }
+
+    async getInterviewAnalysis(interviewId: string) {
+        await prisma.interview_analysis.findFirst({ where: { interview_id: interviewId } });
+    }
+
+    async createInterviewAnalysis(analysis: CreateInterviewAnalysisSchema) {
+        await prisma.interview_analysis.upsert({
+            create: analysis,
+            update: analysis,
+            where: { interview_id: analysis.interview_id },
+        });
+    }
+
+    async getInterviewAudioFile(interviewId: string) {
+        try {
+            return await getStorageClient().downloadFile(bucket, `${interviewId}.wav`);
+        } catch (error) {
+            console.error('Error downloading audio:', error);
+            throw error;
+        } finally {
+            await prisma.$disconnect();
+        }
     }
 
     async getInterviewPreparationByInterviewId(interviewId: string) {

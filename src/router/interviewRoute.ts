@@ -6,6 +6,7 @@ import {
     getInterviewsByUserId,
     getInterviewsGroupedByDate,
     getInterviewPreparation,
+    getInterviewById,
 } from '../controllers/interviewController';
 import { createInterviewAnalysisSchema, getInterviewAnalysisSchema } from '../schemas';
 import { createInterviewAnalysis, getInterviewAnalysis, getInterviewAudioFile } from '../services';
@@ -49,5 +50,7 @@ interviewRouter.post('/', createInterview);
 interviewRouter.delete('/:id', deleteInterview);
 
 interviewRouter.get('/:userId', getInterviewsByUserId);
+
+interviewRouter.get('/', getInterviewById);
 
 interviewRouter.get('/:userId/schedule', getInterviewsGroupedByDate);
