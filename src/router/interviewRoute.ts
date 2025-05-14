@@ -7,6 +7,7 @@ import {
     getInterviewsGroupedByDate,
     getInterviewPreparation,
     getInterviewById,
+    createInterviewPreparation,
 } from '../controllers/interviewController';
 import { createInterviewAnalysisSchema, getInterviewAnalysisSchema } from '../schemas';
 import { createInterviewAnalysis, getInterviewAnalysis, getInterviewAudioFile } from '../services';
@@ -44,6 +45,8 @@ interviewRouter.post('/analysis', async (req, res) => {
 });
 
 interviewRouter.get('/preparation/:interviewId', getInterviewPreparation);
+
+interviewRouter.post('/preparation', createInterviewPreparation);
 
 interviewRouter.post('/', createInterview);
 
