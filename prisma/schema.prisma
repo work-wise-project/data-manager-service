@@ -11,7 +11,6 @@ model company {
   id                    Int                     @id @default(autoincrement())
   name                  String
   info                  String
-  interview_preparation interview_preparation[]
 }
 
 model interview {
@@ -19,7 +18,7 @@ model interview {
   user_id               String                 @map("user") @db.Uuid
   date                  DateTime               @db.Timestamptz(6)
   job_link              String
-  title              String
+  title                 String
   user                  user                   @relation("interview_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   interview_analysis    interview_analysis?    @relation("interview_analysis_interviewTointerview")
   interview_preparation interview_preparation? @relation("interview_preparation_interviewTointerview")
@@ -35,10 +34,9 @@ model interview_analysis {
 
 model interview_preparation {
   interview_id   String    @id @map("interview") @db.Uuid
-  company_id     Int
+  company_info   String
   job_info       String
-  material_links String[]
-  company        company   @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  interview_questions String[]
   interview      interview @relation("interview_preparation_interviewTointerview", fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
