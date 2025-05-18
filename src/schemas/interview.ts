@@ -25,6 +25,6 @@ export const createInterviewPreparationSchema = z.object({
     interview_id: z.string().uuid(),
     company_info: z.string(),
     job_info: z.string(),
-    interview_questions: z.array(z.string()),
+    material_links: z.array(z.string()),
 });
 export type CreateInterviewPreparationSchema = z.infer<typeof createInterviewPreparationSchema>;

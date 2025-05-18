@@ -36,7 +36,7 @@ model interview_preparation {
   interview_id   String    @id @map("interview") @db.Uuid
   company_info   String
   job_info       String
-  interview_questions String[]
+  material_links String[]
   interview      interview @relation("interview_preparation_interviewTointerview", fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
