@@ -1,9 +1,13 @@
 import express, { NextFunction, Request, Response } from 'express';
 import HttpStatus from 'http-status';
+import { createServer as createHttpsServer } from 'https';
 import { ZodError } from 'zod';
 import { interviewRouter, userRouter } from './router';
 import resumeRoute from './router/resumeRoute';
 import skillRoute from './router/skillRoute';
+import { getConfig } from './services/config';
+
+const { isProductionEnv, httpsCert, httpsKey, port } = getConfig();
 
 const app = express();
 
@@ -33,7 +37,7 @@ app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
     res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Internal Server Error' });
 });
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+const serverToRun = isProductionEnv ? createHttpsServer({ key: httpsKey, cert: httpsCert }, app) : app;
+serverToRun.listen(port, () => {
+    console.log(`listening on port ${port} (${isProductionEnv ? 'https' : 'http'})`);
 });
