@@ -1,5 +1,6 @@
 import prisma from '../prisma';
 import { UserBody } from '../types';
+import { UserUpdateInput } from '../types/user';
 
 class UserService {
     private static instance: UserService;
@@ -79,24 +80,38 @@ class UserService {
     //   });
     // }
 
-    async getUserByEmail(email: string) {
+    async getUser(identifier: { id?: string; email?: string }) {
+        const { id, email } = identifier;
+
+        if (!id && !email) {
+            throw new Error('Either id or email must be provided');
+        }
+
         const user = await prisma.user.findUnique({
-            where: {
-                email,
+            where: id ? { id } : { email: email! },
+            include: {
+                user_education: true,
+                user_career: true,
+                user_skills: {
+                    include: {
+                        skill: true,
+                    },
+                },
             },
         });
 
-        return user;
-    }
+        if (!user) {
+            return null;
+        }
 
-    async getUserById(id: string) {
-        const user = await prisma.user.findUnique({
-            where: {
-                id,
-            },
-        });
+        const { user_education, user_career, user_skills, ...rest } = user;
 
-        return user;
+        return {
+            ...rest,
+            education: user_education,
+            career: user_career,
+            skills: user_skills.map((s) => s.skill),
+        };
     }
 
     async createUser({ career, education, resume, ...user }: UserBody) {
@@ -113,46 +128,95 @@ class UserService {
         return createdUser;
     }
 
-    async updateUser(id: string, { career, education, resume, skills, ...userUpdates }: UserBody) {
+    async updateUser(id: string, { career, education, resume, skills, ...userUpdates }: UserUpdateInput) {
+        const prismaUpdates: any = {
+            name: userUpdates.name,
+            email: userUpdates.email,
+            refresh_tokens: userUpdates.refresh_tokens,
+            resume: resume ? { update: resume } : undefined,
+        };
+
+        if (education) {
+            const toCreate = education.filter((e) => !e.is_deleted);
+            const toDelete = education.filter((e) => e.is_deleted);
+
+            prismaUpdates.user_education = {
+                ...(toCreate.length && {
+                    create: toCreate.map((edu) => ({
+                        institute: edu.institute,
+                        years: edu.years,
+                    })),
+                }),
+                ...(toDelete.length && {
+                    deleteMany: toDelete.map((edu) => ({
+                        institute: edu.institute,
+                        years: edu.years,
+                    })),
+                }),
+            };
+        }
+
+        if (career) {
+            const toCreate = career.filter((c) => !c.is_deleted);
+            const toDelete = career.filter((c) => c.is_deleted);
+
+            prismaUpdates.user_career = {
+                ...(toCreate.length && {
+                    create: toCreate.map((c) => ({
+                        company: c.company,
+                        years: c.years,
+                    })),
+                }),
+                ...(toDelete.length && {
+                    deleteMany: toDelete.map((c) => ({
+                        company: c.company,
+                        years: c.years,
+                    })),
+                }),
+            };
+        }
+        if (skills) {
+            const toCreate = skills.filter((s) => !s.is_deleted && s.skill_id !== undefined);
+            const toDelete = skills.filter((s) => s.is_deleted && s.skill_id !== undefined);
+
+            prismaUpdates.user_skills = {
+                ...(toDelete.length && {
+                    deleteMany: toDelete.map((s) => ({
+                        skill_id: s.skill_id,
+                    })),
+                }),
+                ...(toCreate.length && {
+                    create: toCreate.map((s) => ({
+                        skill: {
+                            connect: { id: s.skill_id },
+                        },
+                    })),
+                }),
+            };
+        }
+
         const updatedUser = await prisma.user.update({
             where: { id },
-            data: {
-                name: userUpdates.name,
-                email: userUpdates.email,
-                refresh_tokens: userUpdates.refresh_tokens,
-                resume: resume ? { update: resume } : undefined,
-                user_education: education?.length
-                    ? {
-                          create: education.map((educationData) => ({
-                              user_id: educationData.user_id,
-                              institute: educationData.institute,
-                              years: educationData.years,
-                          })),
-                      }
-                    : undefined,
-                user_career: career?.length
-                    ? {
-                          create: career.map((careerData) => ({
-                              company: careerData.company,
-                              years: careerData.years,
-                          })),
-                      }
-                    : undefined,
-                user_skills: skills?.length
-                    ? {
-                          deleteMany: {},
-                          create: skills.map((skill) => ({
-                              skill: {
-                                  connect: { id: skill.skill_id },
-                              },
-                          })),
-                      }
-                    : undefined,
-            },
+            data: prismaUpdates,
         });
 
         if (!updatedUser) {
             throw new Error('User update failed');
+        }
+
+        return updatedUser;
+    }
+
+    async updateRefreshTokensUser(userId: string, refreshTokens: string[]) {
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                refresh_tokens: refreshTokens,
+            },
+        });
+
+        if (!updatedUser) {
+            throw new Error('Failed to update refresh tokens');
         }
 
         return updatedUser;

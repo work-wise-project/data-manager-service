@@ -17,10 +17,10 @@ export const getUserByIdOrEmailController = async (req: Request, res: Response) 
     const { id, email } = req.query;
     try {
         if (id) {
-            const user = await userService.getUserById(id.toString());
+            const user = await userService.getUser({ id: id.toString() });
             res.status(status.OK).json(user);
         } else if (email) {
-            const user = await userService.getUserByEmail(email.toString());
+            const user = await userService.getUser({ email: email.toString() });
             res.status(status.OK).json(user);
         } else {
             throw new Error('Not supplied email or id');
@@ -50,8 +50,21 @@ export const updateUser = async (req: Request, res: Response) => {
             throw new Error('Not supplied id');
         }
     } catch (error) {
-        console.log('error', error);
+        res.status(status.BAD_REQUEST).send(error);
+    }
+};
 
+export const updateRefreshTokensUser = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    try {
+        if (id) {
+            const user = await userService.updateRefreshTokensUser(id, req.body);
+            res.status(status.OK).json(user);
+        } else {
+            throw new Error('Not supplied id');
+        }
+    } catch (error) {
         res.status(status.BAD_REQUEST).send(error);
     }
 };
