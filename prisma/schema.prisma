@@ -29,6 +29,7 @@ model interview_analysis {
   file_name    String
   file_type    file_type
   analysis     Json
+  created_at DateTime @default(now())
   interview    interview @relation("interview_analysis_interviewTointerview", fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -37,6 +38,7 @@ model interview_preparation {
   company_info   String
   job_info       String
   material_links String[]
+  created_at DateTime @default(now())
   interview      interview @relation("interview_preparation_interviewTointerview", fields: [interview_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
