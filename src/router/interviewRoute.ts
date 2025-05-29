@@ -1,10 +1,13 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import HttpStatus from 'http-status';
 import {
     createInterview,
     deleteInterview,
     getInterviewsByUserId,
     getInterviewsGroupedByDate,
+    getInterviewPreparation,
+    getInterviewById,
+    createInterviewPreparation,
 } from '../controllers/interviewController';
 import { createInterviewAnalysisSchema, getInterviewAnalysisSchema } from '../schemas';
 import { createInterviewAnalysis, getInterviewAnalysis, getInterviewAudioFile } from '../services';
@@ -41,10 +44,16 @@ interviewRouter.post('/analysis', async (req, res) => {
     }
 });
 
+interviewRouter.get('/preparation/:interviewId', getInterviewPreparation);
+
+interviewRouter.post('/preparation', createInterviewPreparation);
+
 interviewRouter.post('/', createInterview);
 
 interviewRouter.delete('/:id', deleteInterview);
 
 interviewRouter.get('/:userId', getInterviewsByUserId);
+
+interviewRouter.get('/', getInterviewById);
 
 interviewRouter.get('/:userId/schedule', getInterviewsGroupedByDate);

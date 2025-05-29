@@ -5,4 +5,6 @@ export type Config = {
     googleCloudKey: string;
     googleStorageResumeBucket: string;
     googleStorageAudioBucket: string;
+    httpsKey: string;
+    httpsCert: string;
 };

@@ -27,7 +27,10 @@ export const getConfig = (): Config => {
     const { env } = process as { env: Record<string, string> };
     const isProductionEnv = env.NODE_ENV === 'production';
 
-    checkEnvironmentVariables([...REQUIRED_ENVIRONMENT_VARIABLES]);
+    checkEnvironmentVariables([
+        ...REQUIRED_ENVIRONMENT_VARIABLES,
+        ...(isProductionEnv ? ['HTTPS_KEY', 'HTTPS_CERT'] : []),
+    ]);
 
     config = {
         isProductionEnv,
@@ -36,6 +39,8 @@ export const getConfig = (): Config => {
         googleCloudKey: env.GOOGLE_CLOUD_KEY,
         googleStorageResumeBucket: env.GOOGLE_STORAGE_RESUME_BUCKET,
         googleStorageAudioBucket: env.GOOGLE_STORAGE_AUDIO_BUCKET,
+        httpsKey: env.HTTPS_KEY || '',
+        httpsCert: env.HTTPS_CERT || '',
     };
 
     return config;
