@@ -77,6 +77,22 @@ class InterviewService {
         await prisma.interview_analysis.findFirst({ where: { interview_id: interviewId } });
     }
 
+    async getLatestInterviewAnalysisByUserId(userId: string) {
+        const latestAnalysis = await prisma.interview_analysis.findFirst({
+            where: { interview: { user_id: userId } },
+            orderBy: { created_at: 'desc' },
+        });
+        return latestAnalysis;
+    }
+
+    async getLatestInterviewPreparationByUserId(userId: string) {
+        const latestPreparation = await prisma.interview_preparation.findFirst({
+            where: { interview: { user_id: userId } },
+            orderBy: { created_at: 'desc' },
+        });
+        return latestPreparation;
+    }
+
     async createInterviewAnalysis(analysis: CreateInterviewAnalysisSchema) {
         await prisma.interview_analysis.upsert({
             create: analysis,

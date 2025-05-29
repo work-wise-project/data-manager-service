@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import status from 'http-status';
 import { interviewService } from '../services/interviewService';
 import { createInterviewPreparationSchema, getInterviewPreparationSchema } from '../schemas';
+import { userCareerService } from '../services/userCareerService';
+import { userEducationService } from '../services/userEducationService';
+import { userSkillService } from '../services/userSkillService';
 
 export const createInterview = async (req: Request, res: Response) => {
     try {
@@ -57,7 +60,7 @@ export const getInterviewsByUserId = async (req: Request, res: Response) => {
     }
 };
 
-export const getInterviewById = async (req: Request, res: Response) => {
+export const getInterviewPreparationData = async (req: Request, res: Response) => {
     try {
         const { id } = req.query;
         if (!id) {
@@ -69,7 +72,34 @@ export const getInterviewById = async (req: Request, res: Response) => {
             res.status(status.NOT_FOUND).send({ message: 'Interview not found' });
             return;
         }
-        res.status(status.OK).json(interview);
+
+        const [career, education, skills, analysis, preparation] = await Promise.all([
+            userCareerService.getCareerByUser(interview.user_id),
+            userEducationService.getEducationByUser(interview.user_id),
+            userSkillService.getSkillsByUser(interview.user_id),
+            interviewService.getLatestInterviewAnalysisByUserId(interview.user_id),
+            interviewService.getLatestInterviewPreparationByUserId(interview.user_id),
+        ]);
+
+        const pointsToImprove =
+            analysis?.analysis && typeof analysis?.analysis === 'object' && 'points_to_improve' in analysis.analysis
+                ? (analysis.analysis as { points_to_improve: string[] }).points_to_improve
+                : [];
+
+        res.status(status.OK).json({
+            jobLink: interview.job_link,
+            skillsList: skills.map((skill) => skill.skill.name) || [],
+            education: education.map((edu) => `${edu.institute} - ${edu.years} years`) || [],
+            career:
+                career.map(
+                    (job) =>
+                        `${job.company ? job.company + ' -' : ''} ${job.job_title ? '' + job.job_title + '-' : ''} ${
+                            job.years ? job.years + ' years' : ''
+                        } `
+                ) || [],
+            prevMaterialLinks: preparation?.material_links || [],
+            pointsToImprove: pointsToImprove || [],
+        });
     } catch (error) {
         console.log('Error fetching interview:', error);
         res.status(status.BAD_REQUEST).send(error);
