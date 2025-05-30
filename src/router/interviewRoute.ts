@@ -1,13 +1,13 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
 import HttpStatus from 'http-status';
 import {
     createInterview,
+    createInterviewPreparation,
     deleteInterview,
-    getInterviewsByUserId,
-    getInterviewsGroupedByDate,
     getInterviewPreparation,
     getInterviewPreparationData,
-    createInterviewPreparation,
+    getInterviewsByUserId,
+    getInterviewsGroupedByDate,
 } from '../controllers/interviewController';
 import { createInterviewAnalysisSchema, getInterviewAnalysisSchema } from '../schemas';
 import { createInterviewAnalysis, getInterviewAnalysis, getInterviewAudioFile } from '../services';
@@ -26,7 +26,7 @@ interviewRouter.get('/analysis/:interviewId', async (req, res) => {
             file: { mimeType, fileBuffer: fileBuffer.toString('base64') },
         });
     } catch (error) {
-        console.error('Error fetching interview analysis');
+        console.error(error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Failed to fetch interview analysis' });
     }
 });
@@ -39,7 +39,7 @@ interviewRouter.post('/analysis', async (req, res) => {
 
         res.status(HttpStatus.CREATED).send({ message: 'Interview analysis created successfully' });
     } catch (error) {
-        console.error('Error creating interview analysis');
+        console.error(error);
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Failed to create interview analysis' });
     }
 });
