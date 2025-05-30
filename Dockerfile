@@ -1,4 +1,4 @@
-FROM node:22.11.0-slim
+FROM node:22.11.0
 
 WORKDIR /data-manager-service
 
