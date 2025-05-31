@@ -6,3 +6,13 @@ export type UserBody = user & {
     career?: user_career[];
     skills?: user_skill[];
 };
+
+export type UserUpdateInput = {
+    name?: string;
+    email?: string;
+    refresh_tokens?: string[];
+    resume?: resume;
+    education?: (Omit<user_education, 'id' | 'user_id'> & { is_deleted?: boolean })[];
+    career?: (Omit<user_career, 'id' | 'user_id'> & { is_deleted?: boolean })[];
+    skills?: (Pick<user_skill, 'skill_id'> & { is_deleted?: boolean })[];
+};
