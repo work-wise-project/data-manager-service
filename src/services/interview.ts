@@ -25,3 +25,23 @@ export const getInterviewAudioFile = async (interviewId: string) => {
         await prisma.$disconnect();
     }
 };
+
+export const getInterviewAnalysisContext = async (interviewId: string, userId: string) => {
+    const interview = await prisma.interview.findFirst({ where: { id: interviewId, user_id: userId } });
+    if (!interview) {
+        throw new Error('Interview not found or does not belong to the user');
+    }
+
+    const history = await prisma.interview_analysis.findMany({
+        where: { interview_id: { not: interviewId }, interview: { user_id: userId, date: { lte: interview.date } } },
+        select: { analysis: true },
+        orderBy: { interview: { date: 'desc' } },
+        take: 3,
+    });
+    const skills = await prisma.user_skill.findMany({
+        where: { user_id: userId },
+        select: { skill: { select: { name: true } } },
+    });
+
+    return { history, skills: skills.map(({ skill: { name } }) => name) };
+};
