@@ -10,3 +10,5 @@ export {
     GetInterviewPreparationSchema,
     getInterviewPreparationSchema,
 } from './interview';
+
+export { ResumeSchema, ResumeSchemaType, ResumeAnalysisSchemaType, ResumeAnalysisSchema } from './resume';
