@@ -1,5 +1,4 @@
 import prisma from '../prisma';
-import { ResumeSchemaType } from '../schemas';
 import { UserBody } from '../types';
 import { UserUpdateInput } from '../types/user';
 
@@ -48,7 +47,7 @@ class UserService {
         };
     }
 
-    async createUser({ career, education, resume, ...user }: UserBody) {
+    async createUser({ career, education, resume, skills, ...user }: UserBody) {
         const createdUser = await prisma.user.create({
             data: {
                 ...user,
@@ -62,11 +61,38 @@ class UserService {
                     : undefined,
                 user_education: education ? { createMany: { data: education } } : undefined,
                 user_career: career ? { createMany: { data: career } } : undefined,
+                user_skills: skills
+                    ? {
+                          create: skills
+                              .filter((s) => !s.is_deleted && s.skill_id !== undefined)
+                              .map((s) => ({
+                                  skill: {
+                                      connect: { id: s.skill_id },
+                                  },
+                              })),
+                      }
+                    : undefined,
                 refresh_tokens: [],
+            },
+            include: {
+                user_education: true,
+                user_career: true,
+                user_skills: {
+                    include: {
+                        skill: true,
+                    },
+                },
             },
         });
 
-        return createdUser;
+        const { user_education, user_career, user_skills, ...rest } = createdUser;
+
+        return {
+            ...rest,
+            education: user_education,
+            career: user_career,
+            skills: user_skills.map((s) => s.skill),
+        };
     }
 
     async updateUser(id: string, { career, education, resume, skills, ...userUpdates }: UserUpdateInput) {
