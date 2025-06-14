@@ -13,73 +13,6 @@ class UserService {
         return UserService.instance;
     }
 
-    // async addSkillToUser(userId: string, skillName: string) {
-    //   const skill = await prisma.skill.findUnique({
-    //     where: {
-    //       name: skillName,
-    //     },
-    //   });
-
-    //   if (!skill) {
-    //     throw new Error('Skill not found');
-    //   }
-
-    //   return await prisma.user.update({
-    //     where: { id: userId },
-    //     data: {
-    //       skills: {
-    //         connect: { id: skill.id },
-    //       },
-    //     },
-    //   });
-    // }
-
-    // async removeSkillFromUser(userId: string, skillName: string) {
-    //   // Find the skill by name
-    //   const skill = await prisma.skill.findUnique({
-    //     where: {
-    //       name: skillName,
-    //     },
-    //   });
-
-    //   if (!skill) {
-    //     throw new Error('Skill not found');
-    //   }
-
-    //   // Remove the skill from the user's profile
-    //   return await prisma.user.update({
-    //     where: { id: userId },
-    //     data: {
-    //       skills: {
-    //         disconnect: { id: skill.id },
-    //       },
-    //     },
-    //   });
-    // }
-
-    // async createUserWithSkill(userId: string, skillName: string) {
-    //   // Find the skill by name
-    //   const skill = await prisma.skill.findUnique({
-    //     where: {
-    //       name: skillName,
-    //     },
-    //   });
-
-    //   if (!skill) {
-    //     throw new Error('Skill not found');
-    //   }
-
-    //   // Remove the skill from the user's profile
-    //   return await prisma.user.update({
-    //     where: { id: userId },
-    //     data: {
-    //       skills: {
-    //         disconnect: { id: skill.id },
-    //       },
-    //     },
-    //   });
-    // }
-
     async getUser(identifier: { id?: string; email?: string }) {
         const { id, email } = identifier;
 
@@ -114,18 +47,52 @@ class UserService {
         };
     }
 
-    async createUser({ career, education, resume, ...user }: UserBody) {
+    async createUser({ career, education, resume, skills, ...user }: UserBody) {
         const createdUser = await prisma.user.create({
             data: {
                 ...user,
-                resume: resume ? { create: resume } : undefined,
+                resume: resume
+                    ? {
+                          create: {
+                              ...resume,
+                              analysis: resume.analysis === null ? undefined : resume.analysis,
+                          },
+                      }
+                    : undefined,
                 user_education: education ? { createMany: { data: education } } : undefined,
                 user_career: career ? { createMany: { data: career } } : undefined,
+                user_skills: skills
+                    ? {
+                          create: skills
+                              .filter((s) => !s.is_deleted && s.skill_id !== undefined)
+                              .map((s) => ({
+                                  skill: {
+                                      connect: { id: s.skill_id },
+                                  },
+                              })),
+                      }
+                    : undefined,
                 refresh_tokens: [],
+            },
+            include: {
+                user_education: true,
+                user_career: true,
+                user_skills: {
+                    include: {
+                        skill: true,
+                    },
+                },
             },
         });
 
-        return createdUser;
+        const { user_education, user_career, user_skills, ...rest } = createdUser;
+
+        return {
+            ...rest,
+            education: user_education,
+            career: user_career,
+            skills: user_skills.map((s) => s.skill),
+        };
     }
 
     async updateUser(id: string, { career, education, resume, skills, ...userUpdates }: UserUpdateInput) {

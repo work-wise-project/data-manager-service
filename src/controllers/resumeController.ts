@@ -39,3 +39,67 @@ export const getResume = async (req: Request, res: Response) => {
         res.status(status.INTERNAL_SERVER_ERROR).send(error);
     }
 };
+
+export const createResumeAnalysis = async (req: Request, res: Response) => {
+    try {
+        const { userId, analysis } = req.body;
+
+        if (!userId || !analysis) {
+            res.status(status.BAD_REQUEST).json({ error: 'Missing required fields' });
+            return;
+        }
+
+        const result = await resumeService.createResumeAnalysis(userId, analysis);
+        res.status(status.OK).json(result);
+    } catch (error) {
+        res.status(status.INTERNAL_SERVER_ERROR).send(error);
+    }
+};
+
+export const createResumeSpellCheck = async (req: Request, res: Response) => {
+    try {
+        const { userId, spellCheck } = req.body;
+
+        if (!userId || !spellCheck) {
+            res.status(status.BAD_REQUEST).json({ error: 'Missing required fields' });
+            return;
+        }
+
+        const result = await resumeService.createResumeSpellCheck(userId, spellCheck);
+        res.status(status.OK).json(result);
+    } catch (error) {
+        res.status(status.INTERNAL_SERVER_ERROR).send(error);
+    }
+};
+
+export const getResumeAnalysis = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            res.status(status.BAD_REQUEST).json({ error: 'No user ID provided' });
+            return;
+        }
+
+        const result = await resumeService.getResumeAnalysis(userId);
+        res.status(status.OK).json(result);
+    } catch (error) {
+        res.status(status.INTERNAL_SERVER_ERROR).send(error);
+    }
+};
+
+export const getResumeSpellCheck = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            res.status(status.BAD_REQUEST).json({ error: 'No user ID provided' });
+            return;
+        }
+
+        const result = await resumeService.getResumeSpellCheck(userId);
+        res.status(status.OK).json(result);
+    } catch (error) {
+        res.status(status.INTERNAL_SERVER_ERROR).send(error);
+    }
+};

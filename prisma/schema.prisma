@@ -44,8 +44,7 @@ model interview_preparation {
 
 model resume {
   user_id     String  @id @map("user") @db.Uuid
-  file        String
-  analysis    String?
+  analysis    Json?
   spell_check String?
   user        user    @relation("resume_userTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

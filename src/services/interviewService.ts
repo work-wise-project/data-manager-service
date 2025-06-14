@@ -1,8 +1,8 @@
-import prisma from '../prisma';
 import { interview } from '@prisma/client';
-import { CreateInterviewPreparationSchema, CreateInterviewAnalysisSchema } from '../schemas';
-import { getStorageClient } from './storage';
+import prisma from '../prisma';
+import { CreateInterviewAnalysisSchema, CreateInterviewPreparationSchema } from '../schemas';
 import { getConfig } from './config';
+import { getStorageClient } from './storage';
 
 const { googleStorageAudioBucket: bucket } = getConfig();
 
@@ -27,9 +27,7 @@ class InterviewService {
         await prisma.interview_analysis.deleteMany({ where: { interview_id: id } });
         await prisma.interview_preparation.deleteMany({ where: { interview_id: id } });
 
-        const deletedInterview = await prisma.interview.delete({ where: { id, user_id: userId } });
-
-        return deletedInterview;
+        return await prisma.interview.delete({ where: { id, user_id: userId } });
     }
 
     async getInterviewsByUserId(userId: string) {
