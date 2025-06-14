@@ -2,9 +2,9 @@ import { resume, user, user_career, user_education, user_skill } from '@prisma/c
 
 export type UserBody = user & {
     resume?: resume;
-    education?: user_education[];
-    career?: user_career[];
-    skills?: user_skill[];
+    education?: (Omit<user_education, 'id' | 'user_id'> & { is_deleted?: boolean })[];
+    career?: (Omit<user_career, 'id' | 'user_id'> & { is_deleted?: boolean })[];
+    skills?: (Pick<user_skill, 'skill_id'> & { is_deleted?: boolean })[];
 };
 
 export type UserUpdateInput = {
