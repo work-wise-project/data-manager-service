@@ -24,10 +24,23 @@ class InterviewService {
     }
 
     async deleteInterview(id: string, userId?: string) {
-        await prisma.interview_analysis.deleteMany({ where: { interview_id: id } });
-        await prisma.interview_preparation.deleteMany({ where: { interview_id: id } });
+        await prisma.interview_analysis.deleteMany({
+            where: {
+                interview_id: id,
+            },
+        });
 
-        return await prisma.interview.delete({ where: { id, user_id: userId } });
+        await prisma.interview_preparation.deleteMany({
+            where: {
+                interview_id: id,
+            },
+        });
+
+        const deletedInterview = await prisma.interview.delete({
+            where: { id, user_id: userId },
+        });
+
+        return deletedInterview;
     }
 
     async getInterviewsByUserId(userId: string) {
