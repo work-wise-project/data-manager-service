@@ -46,9 +46,14 @@ class InterviewService {
     async getInterviewsByUserId(userId: string) {
         const interviews = await prisma.interview.findMany({
             where: { user_id: userId },
+            include: { interview_analysis: true, interview_preparation: true },
         });
 
-        return interviews;
+        return interviews.map(({ interview_analysis, interview_preparation, ...interview }) => ({
+            ...interview,
+            hasAnalysis: !!interview_analysis,
+            hasPreparation: !!interview_preparation,
+        }));
     }
 
     async getInterviewById(id: string) {
